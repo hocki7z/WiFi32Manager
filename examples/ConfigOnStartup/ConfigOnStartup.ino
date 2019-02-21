@@ -10,12 +10,20 @@ already connected to the target WiFi network can access the configuration portal
 the WiFi network credentials will be sent from the browser over an encrypted connection and
 can not be read by observers.
 */
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 
-//needed for library
-#include <ESP8266WebServer.h>
-#include <DNSServer.h>
-#include <WiFiManager.h>          //https://github.com/kentaylor/WiFiManager
+// define ESP8266 or ESP32
+#define ESP8266;  
+//#define ESP32;
+
+#include <WiFi32Manager.h> // https://github.com/edumeneses/WiFi32Manager
+// already includes:
+// Wifi.h (https://github.com/esp8266/Arduino) or ESP8266WiFi.h (https://github.com/esp8266/Arduino)
+// AND
+// WebServer.h or ESP8266WebServer.h
+// AND
+// DNSServer.h
+
+
 // Onboard LED I/O pin on NodeMCU board
 const int PIN_LED = 2; // D4 on NodeMCU and WeMos. Controls the onboard LED.
 

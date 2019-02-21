@@ -5,12 +5,19 @@ requires a pin and a button on the ESP8266 device. The Flash button is convenien
 for this on NodeMCU devices.
 */
 
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
+// define ESP8266 or ESP32
+#define ESP8266;  
+//#define ESP32;
 
-//needed for library
-#include <ESP8266WebServer.h>
-#include <DNSServer.h>
-#include <WiFiManager.h>          //https://github.com/kentaylor/WiFiManager
+#include <WiFi32Manager.h> // https://github.com/edumeneses/WiFi32Manager
+// already includes:
+// Wifi.h (https://github.com/esp8266/Arduino) or ESP8266WiFi.h (https://github.com/esp8266/Arduino)
+// AND
+// WebServer.h or ESP8266WebServer.h
+// AND
+// DNSServer.h
+
+
 // select wich pin will trigger the configuraton portal when set to LOW
 // ESP-01 users please note: the only pins available (0 and 2), are shared 
 // with the bootloader, so always set them HIGH at power-up
@@ -85,8 +92,11 @@ void loop() {
       Serial.println("connected...yeey :)");
     }
     digitalWrite(PIN_LED, HIGH); // Turn led off as we are not in configuration mode.
-    ESP.reset(); // This is a bit crude. For some unknown reason webserver can only be started once per boot up 
+    
+    // This is a bit crude. For some unknown reason webserver can only be started once per boot up
     // so resetting the device allows to go back into config mode again when it reboots.
+    ESP.reset();  // For ESP8266
+    // ESP.restart(); // For ESP32
     delay(5000);
   }
 

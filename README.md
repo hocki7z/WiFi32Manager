@@ -1,21 +1,25 @@
-# Connect To WiFi
-Connect an ESP8266 to WiFi using a web configuration portal served from the ESP8266 operating as an access point.
+# WiFi32Manager
+ESP8266 / ESP32 WiFi Connection manager using a web configuration portal
 
-[![Build Status](https://travis-ci.org/kentaylor/WiFiManager.svg?branch=master)](https://travis-ci.org/kentaylor/WiFiManager)
+This library if forked from [Kentaylor's WiFiManager](https://github.com/kentaylor/WiFiManager), but it uses code for 2 other libraries:
+
+.
+[Zhouhan0126's WiFiManager](https://github.com/zhouhan0126/WIFIMANAGER-ESP32).
+[Tzapu's WiFiManager](https://github.com/tzapu/WiFiManager).
 
 The configuration portal is captive, so it will present the configuration dialogue regardless of the web address selected, excluding https requests.
 
-This is an extensive modification of an existing library. The major changes are:-
+This is a modification of those existing libraries, and it inherits the characteristics of Ken Taylor's WiFiManager:-
 
 - Portal [continues to exist](#portal-continues-to-exist-after-configuration) after configuring the ESP device to provide user feedback on success or otherwise.
 - Provides [guidance](#user-guidance-at-the-same-address-regardless-of-network) to users when they are not connected to the correct network.
-- Supports [configuration from apps](#programmatic-configuration) including the [ESP Connect](https://play.google.com/store/apps/details?id=au.com.umranium.espconnect) Android app. 
+- Supports [configuration from apps](#programmatic-configuration) including the [ESP Connect](https://play.google.com/store/apps/details?id=au.com.umranium.espconnect) Android app.
 - Relies on [automatic connectivity.](#relies-on-automatic-connectivity)
 - Configuration portal initiation [not automatic](#configuration-portal-initiation-not-automatic) when a configured WiFi network is not visible.
-- Configuration portal initiated by [double pressing](#configuration-portal-initiated-by-double-pressing-the-reset-button) the reset button. 
+- Configuration portal initiated by [double pressing](#configuration-portal-initiated-by-double-pressing-the-reset-button) the reset button.
 - Selectively operates in [dual mode](#selectively-operates-in-dual-mode)
 
-This works with the ESP8266 Arduino platform with a recent stable release(2.0.0 or newer) https://github.com/esp8266/Arduino
+This works with the ESP8266 and the ESP32. Use ESP8266 Arduino platform 2.4.1 or newer / use ESP32 1.0.1 or newer.
 
 ## Contents
  - [Features](#features)
@@ -24,14 +28,11 @@ This works with the ESP8266 Arduino platform with a recent stable release(2.0.0 
    - [Programmatic Configuration](#programmatic-configuration)
    - [Relies On Automatic Connectivity](#relies-on-automatic-connectivity)
    - [Configuration Portal Initiation Not Automatic](#configuration-portal-initiation-not-automatic)
-   - [Configuration portal initiated by double pressing the reset button ](#configuration-portal-initiated-by-double-pressing-the-reset-button) 
+   - [Configuration portal initiated by double pressing the reset button ](#configuration-portal-initiated-by-double-pressing-the-reset-button)
    - [Selectively Operates In Dual Mode](#selectively-operates-in-dual-mode)
  - [How It Works](#how-it-works)
- - [How It Looks](#how-it-looks)
- - [Wishlist](#wishlist)
  - [Quick Start](#quick-start)
    - [Installing](#installing)
-     - [From Github](#checkout-from-github)
    - [Using](#using)
  - [Documentation](#documentation)
    - [Access Point Password](#password-protect-the-configuration-access-point)
@@ -61,17 +62,17 @@ Feedback is provided at the same web address, [wifi.urremote.com](http://wifi.ur
 - During configuation the device network is temporarily shut down and restarted which often causes the browsing device to swap networks in the background leaving the user unaware of the network change.
 
 ### Programmatic Configuration
-Configuration using an app can be easier because WiFi configuration through a web browser is non intuitive due to a requirement to switch back and forward between WiFi networks. URL's /state and /scan are provided that respond with data in JSON format for easy control of the web interface from external applications. The [ESP Connect](https://play.google.com/store/apps/details?id=au.com.umranium.espconnect) Android app uses this interface. 
+Configuration using an app can be easier because WiFi configuration through a web browser is non intuitive due to a requirement to switch back and forward between WiFi networks. URL's /state and /scan are provided that respond with data in JSON format for easy control of the web interface from external applications. The [ESP Connect](https://play.google.com/store/apps/details?id=au.com.umranium.espconnect) Android app uses this interface.
 
 ### Relies On Automatic Connectivity
-An ESP8266 stores access point credentials in non volatile memory so these details should only be set once, unless they need to be changed. The ESP8266 is set by default to auto connect and will always do it's best to connect to a network when it has an access point name (SSID) configured. If the access point is visible and the password is correct it will connect in a few seconds. If the access point is not visible or goes away it will reestablish the connection automatically when the access point becomes visible. There are no calls to the Espressif ESP8266 library that can connect to a network faster or more reliably. 
+An ESP8266 stores access point credentials in non volatile memory so these details should only be set once, unless they need to be changed. The ESP8266/ESP32 is set by default to auto connect and will always do it's best to connect to a network when it has an access point name (SSID) configured. If the access point is visible and the password is correct it will connect in a few seconds. If the access point is not visible or goes away it will reestablish the connection automatically when the access point becomes visible. There are no calls to the Espressif ESP8266 library that can connect to a network faster or more reliably.
 
 Older versions of the Espressif library [had a bug](https://github.com/esp8266/Arduino/issues/1997) so that trying to use calls to the Espressif library to connect to a network can sometimes cause the WiFi connectivity to fail until it is rebooted and occasionally can also brick the ESP8266. If you have a device bricked this way it [can be recovered](https://github.com/kentaylor/EraseEsp8266Flash).
 
 ### Configuration Portal Initiation Not Automatic
-WiFi networks can be unavailable temporarily and only a human can know whether the solution to failing to connect is to change the WiFi connection data. Therefore a configuration portal is not initiated automatically when the ESP device can not connect to the configured WiFi access point. 
+WiFi networks can be unavailable temporarily and only a human can know whether the solution to failing to connect is to change the WiFi connection data. Therefore a configuration portal is not initiated automatically when the ESP device can not connect to the configured WiFi access point.
 
-The configuration portal is launched if no WiFi configuration data has been stored or a button is pressed. On a Node MCU board the Flash button can be reused as the configuration portal button. 
+The configuration portal is launched if no WiFi configuration data has been stored or a button is pressed. On a Node MCU board the Flash button can be reused as the configuration portal button.
 
 A configuration portal can be launched on every start up for a minute or so, [if programmed that way](examples/ConfigOnStartup "Example of a configuration portal launched at start up"), but the delay in application start up is unacceptible for most use cases.
 
@@ -79,57 +80,38 @@ A configuration portal can be launched on every start up for a minute or so, [if
 This method avoids the use of a pin for launching the configuration portal.  In the [provided example](examples/ConfigOnDoubleReset "Launch configuration on double reset example")  a double press on a button connected to the reset pin can be used to initiate a configuration portal. This works well on development boards that have a reset button like the [Wemos](https://www.wemos.cc/product/d1-mini-pro.html).
 
 ### Selectively Operates In Dual Mode
-The ESP8266 can simultaneously connect to a Wifi network and run it's own WiFi network in which case it switches the radio channel of it's own network to match the network to which it is attached. When it is searching for a network, the radio channel is changing all the time which makes connecting to it's network flaky. 
+The ESP8266/ESP32 can simultaneously connect to a Wifi network and run it's own WiFi network in which case it switches the radio channel of it's own network to match the network to which it is attached. When it is searching for a network, the radio channel is changing all the time which makes connecting to it's network flaky.
 
-So if the device is successfully connected to a network the configuration portal will be available on both networks but if it is not already connected to a network it will operate in access point mode and not try to connect until new credential are entered to increase reliability. 
+So if the device is successfully connected to a network the configuration portal will be available on both networks but if it is not already connected to a network it will operate in access point mode and not try to connect until new credential are entered to increase reliability.
 
 While trying to connect to the new network it's own WiFi network will necesarily become flaky and it will shutdown and restart it's own WiFi network on a [different channel](http://bbs.espressif.com/viewtopic.php?t=324) after it successfully connects. This can cause a browsing device to switch over to a different network.
 
 ## How It Works
 
 - The [ConfigOnSwitch](examples/ConfigOnswitch) example shows how it works and should be used as the basis for a sketch that uses this library.
-- The concept of ConfigOnSwitch is that a new ESP8266 will start a WiFi configuration portal when powered up and save the configuration data in non volatile memory. Thereafter, the configuration portal will only be started again if a button is pushed on the ESP8266 module.
+- The concept of ConfigOnSwitch is that a new ESP8266/ESP32 will start a WiFi configuration portal when powered up and save the configuration data in non volatile memory. Thereafter, the configuration portal will only be started again if a button is pushed on the ESP8266/ESP32 module.
 - Using any WiFi enabled device with a browser (computer, phone, tablet) connect to the newly created Access Point and type in any http address.
 - Because of the Captive Portal and the DNS server you will either get a 'Join to network' type of popup or get any domain you try to access redirected to the configuration portal.
 - All http web addresses will be redirected to wifi.urremote.com which will be at IP address 192.168.4.1 . This address is also a valid internet address where the user will see advice that they are connected to the wrong network.
 - Choose one of the access points scanned, enter password, click save.
-- ESP will try to connect. If successful, the IP address on the new network will be displayed in the configuration portal. 
+- ESP will try to connect. If successful, the IP address on the new network will be displayed in the configuration portal.
 - The configuration portal will now be visible on two networks, these being it's own network and the network to which it has connected.  On it's own network it will have two IP addresses, the original 192.168.4.1 and the same IP address it has on the network to which it connected.
-- Selecting "close configuration portal" will shutdown the web server, shutdown the ESP8266 WiFi network and return control to the following sketch code.
-
-## How It Looks
-**Default Home Page**
-
- ![ESP8266 WiFi Captive Portal Homepage](http://i.imgur.com/v7tyqRJ.png)
-**Configuration Page**
-
-![ESP8266 WiFi Captive Portal Configuration](http://i.imgur.com/FwdXhTp.png)
-
-
-## Wishlist
-- A non blocking configuration portal. 
-- Initiate configuration portal from a double reset.
-- More usability testing. 
-- Add javascript to undertake scan in the background and update WiFi page when complete.
-- Add multiple sets of network credentials.
+- Selecting "close configuration portal" will shutdown the web server, shutdown the ESP8266/ESP32 WiFi network and return control to the following sketch code.
 
 ## Quick Start
 
 ### Installing
 See ["Installing Arduino libraries"](https://www.arduino.cc/en/Guide/Libraries) and use the Importing a .zip Library method or preferably use manual installation as you can checkout the release from github and use that. This makes it easier to keep current with updates. Installing using the  Library Manager does not work with this version of the library.
 
-####  Checkout from github
-Github version works with release 2.0.0 or newer of the [ESP8266 core for Arduino](https://github.com/esp8266/Arduino)
-- Checkout [library](https://github.com/kentaylor/WiFiManager) to your Arduino libraries folder. Must be [https://github.com/kentaylor/WiFiManager](https://github.com/kentaylor/WiFiManager) version.
-
 ### Using
 - Include in your sketch
 ```cpp
-#include <ESP8266WiFi.h>          //ESP8266 Core WiFi Library (you most likely already have this in your sketch)
+// Define the ESP to use (ESP8266 or ESP32)
+// If nothing is defined the library will assume you are using ESP32
+#define ESP8266;
+//#define ESP32;
 
-#include <DNSServer.h>            //Local DNS Server used for redirecting all requests to the configuration portal
-#include <ESP8266WebServer.h>     //Local WebServer used to serve the configuration portal
-#include <WiFiManager.h>          //https://github.com/kentaylor/WiFiManager WiFi 
+#include <WiFi32Manager.h>          //https://github.com/edumeneses/WiFi32Manager
 ```
 
 - When you want open a config portal initialize library, add
@@ -144,7 +126,7 @@ wifiManager.startConfigPortal()
 While in AP mode, connect to it then open a browser to the gateway IP, default 192.168.4.1, configure wifi, save and it should save WiFi connection information in non volatile memory, reboot and connect.
 
 
-Once WiFi network information is saved in the ESP8266, it will try to connect to WiFi every time it is started without requiring any function calls in the sketch.
+Once WiFi network information is saved in the ESP8266/ESP32, it will try to connect to WiFi every time it is started without requiring any function calls in the sketch.
 
 
 Also see [ConfigOnSwitch example](examples/ConfigOnswitch).
@@ -181,7 +163,7 @@ void saveConfigCallback () {
 ```
 
 #### Configuration Portal Timeout
-If you need to set a timeout so the ESP8266 doesn't hang waiting to be configured for ever. 
+If you need to set a timeout so the ESP8266 doesn't hang waiting to be configured for ever.
 ```cpp
 wifiManager.setConfigPortalTimeout(600);
 ```
@@ -265,26 +247,22 @@ wifiManager.setDebugOutput(false);
 ```
 
 ## Troubleshooting
-If you get compilation errors, more often than not, you may need to install a newer version of the ESP8266 core for Arduino.
+If you get compilation errors, more often than not, you may need to install a newer version of the ESP8266/ESP32 core for Arduino.
 
-Tested down to ESP8266 core 2.0.0. 
-
-Sometimes, the library will only work if you update the ESP8266 core to the latest version because I am using some newly added function.
+Tested down to ESP8266 core 2.4.1 and ESP32 core 1.0.1.
 
 If you connect to the created configuration Access Point but the configuration portal does not show up, just open a browser and type in the IP of the web portal, by default `192.168.4.1`.
 
 
 ## Releases
-#### 0.11
-- forked from this version of the tzapu's WiFi Manager.
+#### 0.1
+- forked from: [kentaylor's WiFiManager](https://github.com/kentaylor/WiFiManager).
 
-See [tzapu's version](https://github.com/tzapu/WiFiManager) for previous release information.
+Uses code from: [zhouhan0126's WiFiManager](https://github.com/zhouhan0126/WIFIMANAGER-ESP32) and [tzapu's WiFiManager](https://github.com/tzapu/WiFiManager).
 
 
 ### Contributions and thanks
-Forked from [tzapu](https://github.com/tzapu/WiFiManager) and additional contributions from [Battika](https://github.com/battika) and  [DataCute](https://github.com/datacute/DoubleResetDetector "Double Reset Detector Repository"). Android partner app by [Umran Abdulla](https://play.google.com/store/apps/details?id=au.com.umranium.espconnect).
-
+Thank you tzapu, kentaylor, zhouhan0126 for the previous work. Also thank you [Alex Nieva](https://github.com/alexnieva) and [Johnty Wang](https://github.com/johnty) for the contributions.
 
 #### Inspiration
-I expected to knock the WiFi connection code over in an afternoon after being inspired by
-http://www.esp8266.com/viewtopic.php?f=29&t=2520 . It was taking longer. Then I came across tzapu's implementation which failed for me and this is my attempt to address the issues I discovered. Some weeks have gone by.
+This WiFi manager version was primarily programmed to use on the wireless T-Sticks. More information at the [IDMIL's website](http://www-new.idmil.org/project/the-t-stick/) and at the [instrument's git](https://github.com/alexnieva/TStick).

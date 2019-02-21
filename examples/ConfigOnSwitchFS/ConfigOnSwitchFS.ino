@@ -1,11 +1,23 @@
-#include <FS.h>
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
-#include <ArduinoJson.h>          //https://github.com/bblanchon/ArduinoJson
+#include <FS.h>  // this needs to be first
 
-//needed for library
-#include <ESP8266WebServer.h>
-#include <DNSServer.h>
-#include <WiFiManager.h>          //https://github.com/kentaylor/WiFiManager
+// define ESP8266 or ESP32
+#define ESP8266;  
+//#define ESP32;
+
+#if defined(ESP8266)
+#else
+#include "SPIFFS.h"
+#endif
+
+#include <WiFi32Manager.h> // https://github.com/edumeneses/WiFi32Manager
+// already includes:
+// Wifi.h (https://github.com/esp8266/Arduino) or ESP8266WiFi.h (https://github.com/esp8266/Arduino)
+// AND
+// WebServer.h or ESP8266WebServer.h
+// AND
+// DNSServer.h
+
+#include <ArduinoJson.h>  // https://github.com/bblanchon/ArduinoJson
 
 // Constants
 
@@ -13,17 +25,17 @@
 // ESP-01 users please note: the only pins available (0 and 2), are shared 
 // with the bootloader, so always set them HIGH at power-up
 // Onboard LED I/O pin on NodeMCU board
-const int PIN_LED = 2; // D4 on NodeMCU and WeMos. Controls the onboard LED.
+const int PIN_LED = LED_BUILTIN; // D4 on NodeMCU and WeMos. Controls the onboard LED.
 /* Trigger for inititating config mode is Pin D3 and also flash button on NodeMCU
  * Flash button is convenient to use but if it is pressed it will stuff up the serial port device driver 
  * until the computer is rebooted on windows machines.
  */     
-const int TRIGGER_PIN = 0; // D3 on NodeMCU and WeMos.
+const int TRIGGER_PIN = 27; // D3 on NodeMCU and WeMos.
 /*
  * Alternative trigger pin. Needs to be connected to a button to use this pin. It must be a momentary connection
  * not connected permanently to ground. Either trigger pin will work.
  */
-const int TRIGGER_PIN2 = 13; // D7 on NodeMCU and WeMos.
+const int TRIGGER_PIN2 = 27; // D7 on NodeMCU and WeMos.
 
 const char* CONFIG_FILE = "/config.json";
 
@@ -62,8 +74,6 @@ void setup() {
   if (!readConfigFile()) {
     Serial.println("Failed to read configuration file, using default values");
   }
-
-  WiFi.printDiag(Serial); //Remove this line if you do not want to see WiFi password printed
 
   if (WiFi.SSID() == "") {
     Serial.println("We haven't got any access point credentials, so get them now");
@@ -168,8 +178,10 @@ void loop() {
     
     digitalWrite(PIN_LED, HIGH); // Turn LED off as we are not in configuration mode.
 
-    ESP.reset(); // This is a bit crude. For some unknown reason webserver can only be started once per boot up 
+    // This is a bit crude. For some unknown reason webserver can only be started once per boot up
     // so resetting the device allows to go back into config mode again when it reboots.
+    ESP.reset();  // For ESP8266
+    //ESP.restart(); // For ESP32
     delay(5000);
   }
 
