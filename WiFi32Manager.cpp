@@ -274,7 +274,7 @@ boolean  WiFiManager::startConfigPortal(char const *apName, char const *apPasswo
     yield();
   }
   WiFi.mode(WIFI_STA);
-  if (TimedOut & WiFi.status() != WL_CONNECTED) {
+  if (TimedOut && (WiFi.status() != WL_CONNECTED)) {
 	WiFi.begin();
     int connRes = waitForConnectResult();
     DEBUG_WM ("Timed out connection result: ");
