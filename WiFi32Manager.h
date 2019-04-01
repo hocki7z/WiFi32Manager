@@ -7,8 +7,8 @@
   Licensed under MIT license
  **************************************************************/
 
-#ifndef WiFi32Manager_h
-#define WiF32Manager_h
+#ifndef WIFI32MANAGER_H_
+#define WIFI32MANAGER_H_
 
 
 #ifdef ESP8266
@@ -231,4 +231,4 @@ class WiFiManager
     }
 };
 
-#endif
+#endif /* WIFI32MANAGER_H_ */
