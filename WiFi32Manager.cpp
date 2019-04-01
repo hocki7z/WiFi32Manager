@@ -988,7 +988,7 @@ int WiFiManager::scanWifiNetworks(int **indicesptr) {
 
         int quality = getRSSIasQuality(WiFi.RSSI(indices[i]));
         if (!(_minimumQuality == -1 || _minimumQuality < quality)) {
-          indices[i] == -1;
+          indices[i] = -1;
           DEBUG_WM(F("Skipping due to quality"));
         }
       }
