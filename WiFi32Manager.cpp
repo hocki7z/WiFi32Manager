@@ -378,7 +378,11 @@ String WiFiManager::getConfigPortalSSID() {
 
 void WiFiManager::resetSettings() {
   DEBUG_WM(F("previous settings invalidated"));
+#if defined(ESP8266)
   WiFi.disconnect(true);
+#else
+  WiFi.disconnect(true, true);
+#endif
   delay(200);
   return;
 }
@@ -878,12 +882,17 @@ void WiFiManager::handleReset() {
 
   DEBUG_WM(F("Sent reset page"));
   delay(5000);
+#if defined(ESP8266)
   WiFi.disconnect(true); // Wipe out WiFi credentials.
-  #if defined(ESP8266)
-    ESP.reset();
-  #else
-    ESP.restart();
-  #endif  delay(2000);
+  ESP.reset();
+#else
+  wifi_mode_t m = WiFi.getMode();
+  if(!(m & WIFI_MODE_STA)) WiFi.mode(WIFI_STA);
+  WiFi.disconnect(false, true); // Wipe out WiFi credentials.
+  if(!(m & WIFI_MODE_STA)) WiFi.mode(m);
+  ESP.restart();
+#endif
+  delay(2000);
 }
 
 void WiFiManager::handleNotFound() {
