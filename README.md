@@ -253,6 +253,30 @@ Tested down to ESP8266 core 2.4.1 and ESP32 core 1.0.1.
 
 If you connect to the created configuration Access Point but the configuration portal does not show up, just open a browser and type in the IP of the web portal, by default `192.168.4.1`.
 
+#### ESP32 problems saving SSID
+
+The ESP32 may return null to WiFi.SSID() after restarting. This problem can be solved by copying the following code to the WiFi.SSID() function in WiFiSTA.cpp (WiFi.h related file at ESP32 board library), usually found in **/⁨Users/USER/⁨Library/Arduino15⁩/packages/esp32/⁨hardware/⁨esp32/⁨1.0.2/⁨libraries/⁨WiFi/⁨src⁩**
+
+```
+String WiFiSTAClass::SSID() const
+{
+    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+        return String();
+    }
+    wifi_ap_record_t info;
+    if(!esp_wifi_sta_get_ap_info(&info)) {
+        return String(reinterpret_cast<char*>(info.ssid));
+    }
+    else{
+          wifi_config_t conf;
+          esp_wifi_get_config(WIFI_IF_STA, &conf);
+          return String(reinterpret_cast<char*>(conf.sta.ssid));    
+    }
+
+    return String();
+}
+```
+
 
 ## Releases
 #### 0.1
