@@ -274,7 +274,7 @@ boolean  WiFiManager::startConfigPortal(char const *apName, char const *apPasswo
     yield();
   }
   WiFi.mode(WIFI_STA);
-  if (TimedOut & WiFi.status() != WL_CONNECTED) {
+  if (TimedOut && WiFi.status() != WL_CONNECTED) {
 	WiFi.begin();
     int connRes = waitForConnectResult();
     DEBUG_WM ("Timed out connection result: ");
@@ -359,7 +359,7 @@ void WiFiManager::startWPS() {
 }
 //Convenient for debugging but wasteful of program space.
 //Remove if short of space
-char* WiFiManager::getStatus(int status)
+const char* WiFiManager::getStatus(int status)
 {
    switch (status)
    {
@@ -766,7 +766,7 @@ void WiFiManager::handleInfo() {
   page += F("<td>Menu page.</td></tr>");
   page += F("<tr><td><a href=\"/wifi\">/wifi</a></td>");
   page += F("<td>Show WiFi scan results and enter WiFi configuration.</td></tr>");
-  page += F("<tr><td><a href=\"/wifisave\">/wifisave\</a></td>");
+  page += F("<tr><td><a href=\"/wifisave\">/wifisave</a></td>");
   page += F("<td>Save WiFi configuration information and configure device. Needs variables supplied.</td></tr>");
   page += F("<tr><td><a href=\"/close\">/close</a></td>");
   page += F("<td>Close the configuration server and configuration WiFi network.</td></tr>");
@@ -883,7 +883,8 @@ void WiFiManager::handleReset() {
     ESP.reset();
   #else
     ESP.restart();
-  #endif  delay(2000);
+  #endif
+  delay(2000);
 }
 
 void WiFiManager::handleNotFound() {
@@ -988,7 +989,7 @@ int WiFiManager::scanWifiNetworks(int **indicesptr) {
 
         int quality = getRSSIasQuality(WiFi.RSSI(indices[i]));
         if (!(_minimumQuality == -1 || _minimumQuality < quality)) {
-          indices[i] == -1;
+          // indices[i] == -1; has no effect?
           DEBUG_WM(F("Skipping due to quality"));
         }
       }
