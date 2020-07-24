@@ -359,7 +359,7 @@ void WiFiManager::startWPS() {
 }
 //Convenient for debugging but wasteful of program space.
 //Remove if short of space
-char* WiFiManager::getStatus(int status)
+const char* WiFiManager::getStatus(int status)
 {
    switch (status)
    {
@@ -770,7 +770,7 @@ void WiFiManager::handleInfo() {
   page += F("<td>Menu page.</td></tr>");
   page += F("<tr><td><a href=\"/wifi\">/wifi</a></td>");
   page += F("<td>Show WiFi scan results and enter WiFi configuration.</td></tr>");
-  page += F("<tr><td><a href=\"/wifisave\">/wifisave\</a></td>");
+  page += F("<tr><td><a href=\"/wifisave\">/wifisave</a></td>");
   page += F("<td>Save WiFi configuration information and configure device. Needs variables supplied.</td></tr>");
   page += F("<tr><td><a href=\"/close\">/close</a></td>");
   page += F("<td>Close the configuration server and configuration WiFi network.</td></tr>");
@@ -997,7 +997,7 @@ int WiFiManager::scanWifiNetworks(int **indicesptr) {
 
         int quality = getRSSIasQuality(WiFi.RSSI(indices[i]));
         if (!(_minimumQuality == -1 || _minimumQuality < quality)) {
-          indices[i] = -1;
+          // indices[i] == -1; has no effect?
           DEBUG_WM(F("Skipping due to quality"));
         }
       }

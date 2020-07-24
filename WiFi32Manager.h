@@ -150,7 +150,7 @@ class WiFiManager
 
     void          setupConfigPortal();
     void          startWPS();
-    char*         getStatus(int status);
+    const char*   getStatus(int status);
 
     const char*   _apName                 = "no-net";
     const char*   _apPassword             = NULL;
